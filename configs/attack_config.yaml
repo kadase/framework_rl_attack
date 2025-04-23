@@ -9,8 +9,8 @@ attack:
     env_name: "OnlineAttackEnv-v0"
     agent_path: "/Users/dasha/Documents/adversarial_framework_0604/agents/rl_agent.zip"
     device: "cpu"
-    visualize: True  # Включаем визуализацию
-    save_results: True  # Включаем сохранение результатов
+    visualize: True
+    save_results: True 
 
 model:
   type: "pytorch"
