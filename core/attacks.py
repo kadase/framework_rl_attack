@@ -34,9 +34,9 @@ class RLAttack(Attack):
         original_pred = original_output.argmax().item()
 
         perturbed_output = original_output
-        perturbed_obs_tensor = input_data  # fallback на случай, если все попытки неудачны
+        perturbed_obs_tensor = input_data 
 
-        for attempt in range(10):  # максимум 3 попытки
+        for attempt in range(10): 
             obs = self.vec_env.reset()
             action, _ = self.agent.predict(obs)
 
@@ -58,7 +58,7 @@ class RLAttack(Attack):
 
             perturbed_pred = perturbed_output.argmax().item()
             if perturbed_pred != original_pred:
-                print(f"✅ Успешная атака на попытке {attempt+1}")
+                print(f"Успешная атака на попытке {attempt+1}")
                 break
 
         return perturbed_obs_tensor, torch.norm(original_output - perturbed_output)
@@ -72,8 +72,8 @@ class FGSMAttack(Attack):
     def __init__(self, model, config):
         super().__init__(model, config)
         self.epsilon = config.get("epsilon", 0.03)
-        self.targeted = config.get("targeted", False)  # Включить целевые атаки
-        self.target_class = config.get("target_class", None)  # Целевой класс
+        self.targeted = config.get("targeted", False)
+        self.target_class = config.get("target_class", None)
 
     def generate(self, input_data):
         input_tensor = input_data.clone().detach().requires_grad_(True)
@@ -104,8 +104,8 @@ class PGDAttack(Attack):
         self.epsilon = config.get("epsilon", 0.03)
         self.alpha = config.get("alpha", 0.01)
         self.num_steps = config.get("num_steps", 10)
-        self.targeted = config.get("targeted", False)  # Включить целевые атаки
-        self.target_class = config.get("target_class", None)  # Целевой класс
+        self.targeted = config.get("targeted", False)
+        self.target_class = config.get("target_class", None)
 
     def generate(self, input_data):
         perturbed_data = input_data.clone().detach()
@@ -142,9 +142,9 @@ class PGDAttack(Attack):
 class CWAttack(Attack):
     def __init__(self, model, config):
         super().__init__(model, config)
-        self.confidence = config.get("confidence", 0)  # Параметр уверенности
-        self.lr = config.get("lr", 0.01)  # Скорость обучения
-        self.num_steps = config.get("num_steps", 100)  # Количество итераций
+        self.confidence = config.get("confidence", 0)
+        self.lr = config.get("lr", 0.01) 
+        self.num_steps = config.get("num_steps", 100)
 
     def generate(self, input_data):
         # Инициализируем возмущения
@@ -156,19 +156,16 @@ class CWAttack(Attack):
         for _ in range(self.num_steps):
             optimizer.zero_grad()
             
-            # Вычисляем предсказания модели
             output = self.model(perturbed_data)
             
-            # Вычисляем функцию потерь Carlini-Wagner
+            # Вычисление функции потерь Carlini-Wagner
             correct_class = torch.argmax(output, dim=1)
             target_loss = output[0, correct_class] - torch.max(output[0, output[0] != correct_class])
             loss = torch.clamp(target_loss + self.confidence, min=0)
             
-            # Добавляем регуляризацию по норме возмущения
             perturbation_norm = torch.norm(perturbed_data - input_data)
             loss += perturbation_norm
             
-            # Обновляем возмущения
             loss.backward(retain_graph=True)
             optimizer.step()
             

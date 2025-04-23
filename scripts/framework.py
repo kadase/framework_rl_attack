@@ -63,17 +63,17 @@ def main():
     attack = AttackFactory.create(config["attack"], model)
 
     cap = cv2.VideoCapture(0)
-    prediction_history = deque(maxlen=5)  # Храним последние 5 предсказаний
+    prediction_history = deque(maxlen=5)
     last_stable_pred = None
     if not cap.isOpened():
-        raise RuntimeError("Camera initialization failed")
+        raise RuntimeError("Не удалось выполнить инициализацию камеры")
 
-    last_pred = None  # <-- Инициализация переменной до начала цикла
+    last_pred = None 
 
     while True:
         ret, frame = cap.read()
         if not ret or frame is None:
-            print("Frame capture error")
+            print("Ошибка захвата кадра")
             continue
 
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -85,20 +85,18 @@ def main():
             original_output = model(processed)
             original_pred = original_output.argmax().item()
             
-        # Добавим предсказание в историю
         prediction_history.append(original_pred)
 
-        # Находим самое частое предсказание в истории
         most_common_pred, freq = Counter(prediction_history).most_common(1)[0]
 
-        # Проверяем, изменился ли "стабильный" класс
+        # Проверка: изменился ли "стабильный" класс
         if last_stable_pred is None or most_common_pred != last_stable_pred:
-            print(f"⚠️ Стабильное предсказание изменилось: {last_stable_pred} → {most_common_pred}")
+            print(f"⚠Стабильное предсказание изменилось: {last_stable_pred} → {most_common_pred}")
         last_stable_pred = most_common_pred
         
-        # Проверяем изменение предсказания
+        # Проверка изменениz предсказания
         if last_pred != original_pred:
-            print(f"⚠️ Предсказание изменилось: {last_pred} → {original_pred}")
+            print(f"⚠Предсказание изменилось: {last_pred} → {original_pred}")
         last_pred = original_pred
 
         adversarial = attack.apply(processed)
@@ -133,8 +131,8 @@ def main():
 
         save_attack_metadata(original_pred, perturbed_pred, orig_conf, perturbed_conf, perturbation)
 
-        cv2.imshow('Original', frame)
-        cv2.imshow('Adversarial', adv_display_bgr)
+        cv2.imshow('Оригинальный видеопоток', frame)
+        cv2.imshow('Атакованный видеопоток', adv_display_bgr)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

@@ -9,13 +9,13 @@ def visualize_attack(original_image, perturbed_image, original_pred, perturbed_p
     # Оригинальное изображение
     plt.subplot(1, 2, 1)
     plt.imshow(original_image)
-    plt.title(f"Original Image\nPrediction: {original_pred}")
+    plt.title(f"Исходное изображение\nПрогноз: {original_pred}")
     plt.axis('off')
     
     # Возмущенное изображение
     plt.subplot(1, 2, 2)
     plt.imshow(perturbed_image)
-    plt.title(f"Perturbed Image\nPrediction: {perturbed_pred}")
+    plt.title(f"Возмущенное изображениеe\nПрогноз: {perturbed_pred}")
     plt.axis('off')
     
     plt.show()
@@ -42,12 +42,12 @@ def save_results(original_image, perturbed_image, original_pred, perturbed_pred,
     plt.figure(figsize=(10, 5))
     plt.subplot(1, 2, 1)
     plt.imshow(original_resized)
-    plt.title(f"Original Image\nPrediction: {original_pred}")
+    plt.title(f"Исходное изображение\nПрогноз: {original_pred}")
     plt.axis('off')
 
     plt.subplot(1, 2, 2)
     plt.imshow(adversarial_resized)
-    plt.title(f"Perturbed Image\nPrediction: {perturbed_pred}")
+    plt.title(f"Возмущенное изображениеe\nПрогноз: {perturbed_pred}")
     plt.axis('off')
 
     plt.savefig(save_path)

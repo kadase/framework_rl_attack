@@ -9,12 +9,12 @@ class OnlineAttackEnv(gym.Env):
         super().__init__()
         self.target_model = target_model  # Целевая модель (опционально)
         self.demo_mode = demo_mode  # Демо-режим
-        self.use_target_model = use_target_model  # Использовать ли целевую модель для расчета награды
+        self.use_target_model = use_target_model 
         self.max_retries = 3
         self.max_episode_steps = 100
         self.current_step = 0
         self.last_processed_frame = None
-        self.state = None  # Инициализируем атрибут state
+        self.state = None 
 
         # Пространства наблюдений и действий
         self.observation_space = spaces.Box(
@@ -53,9 +53,8 @@ class OnlineAttackEnv(gym.Env):
             else:
                 raise ValueError("Не удалось получить кадр с камеры после нескольких попыток")
 
-        # Убедитесь, что наблюдение возвращается в формате (H, W, C)
         self.last_processed_frame = observation.copy()
-        self.state = observation  # Инициализируем state текущим кадром
+        self.state = observation
         return observation, {}
 
 
@@ -82,7 +81,7 @@ class OnlineAttackEnv(gym.Env):
         if np.isnan(processed_frame).any() or np.isinf(processed_frame).any():
             raise ValueError("Обработанный кадр содержит NaN или бесконечные значения!")
 
-        # Применяем возмущение
+        # Применение возмущения
         perturbed_frame = self.apply_perturbation(action)
         if np.isnan(perturbed_frame.numpy()).any() or np.isinf(perturbed_frame.numpy()).any():
             raise ValueError("Возмущенный кадр содержит NaN или бесконечные значения!")
@@ -95,20 +94,16 @@ class OnlineAttackEnv(gym.Env):
         truncated = self.current_step >= self.max_episode_steps
         terminated = terminated or truncated
 
-        # Обновляем last_processed_frame
         self.last_processed_frame = processed_frame.copy()
 
-        # Убедитесь, что наблюдение возвращается в формате (H, W, C)
         return perturbed_frame.numpy(), float(reward), terminated, truncated, {}
 
     def _preprocess(self, frame):
-        # Добавляем размытие, чтобы снизить шум
+        # Добавление размытие, чтобы снизить шум
         blurred = cv2.GaussianBlur(frame, (5, 5), 0)
 
-        # Уменьшаем размер изображения до 84x84
         resized = cv2.resize(blurred.astype(np.uint8), (84, 84))
 
-        # Нормализуем изображение в диапазон [0, 1]
         resized = resized / 255.0
 
         return resized  # (H, W, C)
@@ -116,23 +111,21 @@ class OnlineAttackEnv(gym.Env):
 
     def apply_perturbation(self, action):
         if self.state is None:
-            raise ValueError("State is not initialized. Call reset() first.")
+            raise ValueError("Состояние не инициализировано. Сначала вызовите функцию reset()")
         
         # Проверка размерности action
         if action.shape != (3, 84, 84):
-            raise ValueError(f"Action shape {action.shape} does not match expected shape (3, 84, 84)!")
-        
-        # Преобразуем self.state и action в torch.Tensor
+            raise ValueError(f"Форма действия {action.shape} не соответствует ожидаемой форме (3, 84, 84)!")
+
         state_tensor = torch.tensor(self.state, dtype=torch.float32)  # Формат (H, W, C)
         action_tensor = torch.tensor(action, dtype=torch.float32)  # Формат (C, H, W)
         
         # Применяем возмущение
-        perturbed_state = state_tensor + action_tensor.permute(1, 2, 0)  # Приводим action к формату (H, W, C)
-        perturbed_state = torch.clamp(perturbed_state, 0, 1)  # Обрезаем значения в диапазоне [0, 1]
+        perturbed_state = state_tensor + action_tensor.permute(1, 2, 0) 
+        perturbed_state = torch.clamp(perturbed_state, 0, 1) 
         
-        # Обновляем состояние среды
-        self.state = perturbed_state.numpy()  # Обновляем состояние среды (numpy.ndarray)
-        return perturbed_state  # Возвращаем perturbed_state как torch.Tensor
+        self.state = perturbed_state.numpy() 
+        return perturbed_state
 
     def _calculate_reward(self, perturbed_frame):
         if self.use_target_model and self.target_model is not None:
@@ -167,7 +160,6 @@ class OnlineAttackEnv(gym.Env):
             else:
                 reward = 0.0
         else:
-            # Без модели — используем L2 разницу как суррогат
             if self.last_processed_frame is None:
                 reward = 0.0
             else:

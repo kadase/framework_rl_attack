@@ -6,7 +6,6 @@ import yaml
 import numpy as np
 from tqdm import tqdm
 
-# Добавляем корень проекта в sys.path
 project_root = Path(__file__).resolve().parent.parent
 sys.path.append(str(project_root))
 
@@ -55,11 +54,10 @@ def train_rl_agent():
     if np.isnan(obs).any() or np.isinf(obs).any():
         raise ValueError("Наблюдения содержат NaN или бесконечные значения!")
 
-    print("Initializing model...")
+    print("Инициализация модели...")
 
     hyperparams = TRAIN_CONFIG["hyperparams"].copy()
 
-    # Поддержка строкового пути до кастомного экстрактора
     if "policy_kwargs" in hyperparams:
         features_class_str = hyperparams["policy_kwargs"]["features_extractor_class"]
         module_name, class_name = features_class_str.rsplit(".", 1) if "." in features_class_str else ("core.custom_cnn", features_class_str)

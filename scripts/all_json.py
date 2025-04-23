@@ -13,8 +13,7 @@ for filename in os.listdir(input_folder):
             data = json.load(f)
             all_attacks.append(data)
 
-# Сохраняем в один JSON-файл
 with open(output_file, "w") as f:
     json.dump(all_attacks, f, indent=4)
 
-print(f"✅ Объединено {len(all_attacks)} атак в файл {output_file}")
+print(f"Объединено {len(all_attacks)} атак в файл {output_file}")

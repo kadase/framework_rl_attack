@@ -1,7 +1,7 @@
 import json
 import matplotlib.pyplot as plt
+import os
 
-# Проверка доступности Seaborn
 try:
     import seaborn as sns
     SEABORN_AVAILABLE = True
@@ -39,7 +39,6 @@ def visualize_with_matplotlib(logs):
     plt.grid()
     plt.show()
 
-# Визуализация логов с помощью Seaborn
 def visualize_with_seaborn(logs):
     if not SEABORN_AVAILABLE:
         print("Seaborn не установлен. Используйте Matplotlib для визуализации.")
@@ -72,7 +71,7 @@ def visualize_with_seaborn(logs):
 
 # Основная функция
 def main():
-    log_file = "/Users/dasha/Documents/adversarial_framework/training_log.json" # Путь к файлу с логами
+    log_file = os.path.join(os.path.dirname(__file__), "scripts", "training_log.json") # Путь к файлу с логами
     print(log_file)
     logs = load_logs(log_file)
 

@@ -1,4 +1,4 @@
-from .model import PyTorchModel  # Импортируем PyTorchModel
+from .model import PyTorchModel 
 from .attacks import RLAttack, FGSMAttack, PGDAttack, CWAttack
 
 class AttackFactory:
